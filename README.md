@@ -56,23 +56,30 @@ lms/
 ## Setup & Run
 
 ### 1. Install Python 3.10+
-
-### 2. Install dependencies
-```bash
+### 2. Create a Virtual Environment
+Bash
+'python -m venv venv'
+### 3. Activate the Virtual Environment
+Bash
+'venv\Scripts\activate'
+### 4. Install Required Packages
+Bash
+'pip install -r requirements.txt'
+### 5. Install dependencies
+bash
 pip install flask werkzeug
-```
 
-### 3. Run the application
+### 6. Run the application
 ```bash
 python app.py
 ```
 
-### 4. Open in browser
+### 7. Open in browser
 ```
 http://localhost:5000
 ```
 
-### 5. Default login
+### 8. Default login
 - **Username:** admin
 - **Password:** admin123
 
