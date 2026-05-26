@@ -1,0 +1,122 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>{% block title %}Library Management System{% endblock %} | AAU LMS</title>
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}"/>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css"/>
+  <style>
+    /* Sidebar toggle - inline so cache can never break it */
+    .sidebar { transition: transform .25s ease; transform: translateX(0); }
+    .sidebar.collapsed { transform: translateX(-100%) !important; }
+    .main-wrapper { transition: margin-left .25s ease; }
+    .main-wrapper.expanded { margin-left: 0 !important; }
+  </style>
+</head>
+<body class="{% if not session.get('user_id') %}auth-page{% endif %}">
+
+{% if session.get('user_id') %}
+<!-- ── Sidebar ─────────────────────────────────────────── -->
+<aside class="sidebar" id="sidebar">
+  <div class="sidebar-brand">
+    <span class="brand-icon"><i class="fas fa-book-open"></i></span>
+    <span class="brand-text">AAU Library</span>
+  </div>
+
+  <nav class="sidebar-nav">
+    <a href="{{ url_for('dashboard') }}"
+       class="nav-item {% if request.endpoint == 'dashboard' %}active{% endif %}">
+      <i class="fas fa-tachometer-alt"></i><span>Dashboard</span>
+    </a>
+    <a href="{{ url_for('books') }}"
+       class="nav-item {% if 'book' in request.endpoint %}active{% endif %}">
+      <i class="fas fa-book"></i><span>Books</span>
+    </a>
+    <a href="{{ url_for('members') }}"
+       class="nav-item {% if 'member' in request.endpoint %}active{% endif %}">
+      <i class="fas fa-users"></i><span>Members</span>
+    </a>
+    <a href="{{ url_for('borrow') }}"
+       class="nav-item {% if request.endpoint == 'borrow' %}active{% endif %}">
+      <i class="fas fa-hand-holding-heart"></i><span>Borrow Book</span>
+    </a>
+    <a href="{{ url_for('return_book') }}"
+       class="nav-item {% if request.endpoint == 'return_book' %}active{% endif %}">
+      <i class="fas fa-undo-alt"></i><span>Return Book</span>
+    </a>
+    <a href="{{ url_for('fines') }}"
+       class="nav-item {% if request.endpoint == 'fines' %}active{% endif %}">
+      <i class="fas fa-receipt"></i><span>Fines</span>
+    </a>
+    <a href="{{ url_for('transactions') }}"
+       class="nav-item {% if request.endpoint == 'transactions' %}active{% endif %}">
+      <i class="fas fa-history"></i><span>History</span>
+    </a>
+  </nav>
+
+  <div class="sidebar-footer">
+    <div class="user-info">
+      <div class="user-avatar">{{ session.username[0]|upper }}</div>
+      <div>
+        <div class="user-name">{{ session.username }}</div>
+        <div class="user-role">{{ session.role }}</div>
+      </div>
+    </div>
+    <a href="{{ url_for('logout') }}" class="logout-btn" title="Logout">
+      <i class="fas fa-sign-out-alt"></i>
+    </a>
+  </div>
+</aside>
+
+<!-- ── Main Content ────────────────────────────────────── -->
+<div class="main-wrapper">
+  <header class="topbar">
+    <button class="sidebar-toggle" onclick="toggleSidebar()">
+      <i class="fas fa-bars"></i>
+    </button>
+    <div class="topbar-title">{% block page_title %}{% endblock %}</div>
+    <div class="topbar-right">
+      <span class="badge-role {{ session.role|lower }}">{{ session.role }}</span>
+    </div>
+  </header>
+
+  <!-- Flash messages -->
+  <div class="flash-container">
+    {% with messages = get_flashed_messages(with_categories=true) %}
+      {% for category, message in messages %}
+        <div class="alert alert-{{ category }}">
+          <i class="fas {% if category == 'success' %}fa-check-circle
+                        {% elif category == 'danger' %}fa-exclamation-circle
+                        {% elif category == 'warning' %}fa-exclamation-triangle
+                        {% else %}fa-info-circle{% endif %}"></i>
+          <span>{{ message }}</span>
+          <button class="alert-close" onclick="this.parentElement.remove()">×</button>
+        </div>
+      {% endfor %}
+    {% endwith %}
+  </div>
+
+  <main class="main-content">
+    {% block content %}{% endblock %}
+  </main>
+</div>
+
+{% else %}
+  {% block auth_content %}{% endblock %}
+{% endif %}
+
+<script src="{{ url_for('static', filename='js/main.js') }}"></script>
+<script>
+  /* Sidebar toggle - inline fallback ensures this always works */
+  function toggleSidebar() {
+    var sidebar = document.getElementById('sidebar');
+    var wrapper = document.querySelector('.main-wrapper');
+    if (!sidebar) return;
+    sidebar.classList.toggle('collapsed');
+    if (wrapper) wrapper.classList.toggle('expanded');
+  }
+</script>
+{% block scripts %}{% endblock %}
+</body>
+</html>

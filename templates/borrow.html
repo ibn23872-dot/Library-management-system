@@ -1,0 +1,94 @@
+{% extends 'base.html' %}
+{% block title %}Borrow Book{% endblock %}
+{% block page_title %}Borrow Book{% endblock %}
+
+{% block content %}
+<div class="page-header">
+  <h1><i class="fas fa-hand-holding-heart"></i> Issue a Book</h1>
+</div>
+
+<div style="display:grid;grid-template-columns:1fr 1fr;gap:24px;">
+  <!-- Form -->
+  <div class="card">
+    <div class="card-header">
+      <i class="fas fa-edit" style="color:var(--primary)"></i>
+      <h2>Borrowing Details</h2>
+    </div>
+    <div class="card-body">
+      <form method="POST">
+        <div class="form-group" style="margin-bottom:18px;">
+          <label for="member_id">Member ID <span style="color:var(--danger)">*</span></label>
+          <input type="number" id="member_id" name="member_id"
+                 placeholder="Enter member ID"
+                 oninput="lookupMember(this, document.getElementById('member-info'))"
+                 required>
+          <div id="member-info" style="margin-top:6px;min-height:24px;"></div>
+        </div>
+        <div class="form-group" style="margin-bottom:24px;">
+          <label for="isbn">Book ISBN <span style="color:var(--danger)">*</span></label>
+          <input type="text" id="isbn" name="isbn"
+                 placeholder="Enter book ISBN"
+                 oninput="lookupBook(this, document.getElementById('book-info'))"
+                 required>
+          <div id="book-info" style="margin-top:6px;min-height:24px;"></div>
+        </div>
+        <button type="submit" class="btn btn-primary" style="width:100%;justify-content:center;padding:12px;">
+          <i class="fas fa-check-circle"></i> Issue Book
+        </button>
+      </form>
+    </div>
+  </div>
+
+  <!-- Rules info card -->
+  <div class="card">
+    <div class="card-header">
+      <i class="fas fa-info-circle" style="color:var(--info)"></i>
+      <h2>Borrowing Policy</h2>
+    </div>
+    <div class="card-body">
+      <table style="width:100%;font-size:13.5px;">
+        <thead>
+          <tr>
+            <th>Membership Type</th>
+            <th>Days Allowed</th>
+            <th>Max Books</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr><td>Student</td><td>14 days</td><td>3 books</td></tr>
+          <tr><td>Faculty</td><td>30 days</td><td>5 books</td></tr>
+          <tr><td>Staff</td>  <td>21 days</td><td>4 books</td></tr>
+        </tbody>
+      </table>
+      <div style="margin-top:16px;padding:12px;background:#eff6ff;border-radius:8px;font-size:13px;color:#1d4ed8;">
+        <i class="fas fa-info-circle"></i>
+        <strong>Fine Rate:</strong> 2.00 ETB per overdue day
+      </div>
+    </div>
+  </div>
+</div>
+
+{% if result %}
+<div class="result-box" style="margin-top:24px;">
+  <h3><i class="fas fa-check-circle" style="color:var(--success)"></i> Book Issued Successfully</h3>
+  <div class="result-grid">
+    <div class="result-item">
+      <label>Member Name</label>
+      <span>{{ result.member_name }}</span>
+    </div>
+    <div class="result-item">
+      <label>Book Title</label>
+      <span>{{ result.book_title }}</span>
+    </div>
+    <div class="result-item">
+      <label>Issue Date</label>
+      <span>{{ result.issue_date }}</span>
+    </div>
+    <div class="result-item">
+      <label>Due Date</label>
+      <span>{{ result.due_date }}</span>
+    </div>
+  </div>
+</div>
+{% endif %}
+{% endblock %}

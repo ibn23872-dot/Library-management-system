@@ -1,0 +1,88 @@
+{% extends 'base.html' %}
+{% block title %}{{ action }} Member{% endblock %}
+{% block page_title %}{{ action }} Member{% endblock %}
+
+{% block content %}
+<div class="page-header">
+  <h1><i class="fas fa-user-{{ 'plus' if action == 'Register' else 'edit' }}"></i> {{ action }} Member</h1>
+  <a href="{{ url_for('members') }}" class="btn btn-ghost">
+    <i class="fas fa-arrow-left"></i> Back to Members
+  </a>
+</div>
+
+<div class="card">
+  <div class="card-header">
+    <i class="fas fa-id-card" style="color:var(--primary)"></i>
+    <h2>Member Information</h2>
+  </div>
+  <div class="card-body">
+    <form method="POST">
+      <div class="form-grid">
+        <div class="form-group" style="grid-column:span 2">
+          <label for="full_name">Full Name <span style="color:var(--danger)">*</span></label>
+          <input type="text" id="full_name" name="full_name"
+                 value="{{ member.full_name if member else '' }}"
+                 placeholder="Full name" required>
+        </div>
+        <div class="form-group">
+          <label for="membership_type">Membership Type <span style="color:var(--danger)">*</span></label>
+          <select id="membership_type" name="membership_type" required>
+            {% for t in ['Student','Faculty','Staff'] %}
+            <option value="{{ t }}"
+              {{ 'selected' if member and member.membership_type == t else '' }}>
+              {{ t }}
+            </option>
+            {% endfor %}
+          </select>
+        </div>
+        <div class="form-group">
+          <label for="department">Department / Year</label>
+          <input type="text" id="department" name="department"
+                 value="{{ member.department if member else '' }}"
+                 placeholder="e.g. Computer Science, Year 3">
+        </div>
+        <div class="form-group">
+          <label for="email">Email</label>
+          <input type="email" id="email" name="email"
+                 value="{{ member.email if member else '' }}"
+                 placeholder="email@example.com">
+        </div>
+        <div class="form-group">
+          <label for="contact_number">Contact Number</label>
+          <input type="text" id="contact_number" name="contact_number"
+                 value="{{ member.contact_number if member else '' }}"
+                 placeholder="+251 9XX XXX XXXX">
+        </div>
+        {% if not member %}
+        <div class="form-group">
+          <label for="start_date">Membership Start Date <span style="color:var(--danger)">*</span></label>
+          <input type="date" id="start_date" name="start_date"
+                 value="{{ member.start_date if member else '' }}" required>
+        </div>
+        {% endif %}
+        <div class="form-group">
+          <label for="expiry_date">Expiry Date <span style="color:var(--danger)">*</span></label>
+          <input type="date" id="expiry_date" name="expiry_date"
+                 value="{{ member.expiry_date if member else '' }}" required>
+        </div>
+        {% if member %}
+        <div class="form-group">
+          <label for="status">Account Status</label>
+          <select id="status" name="status">
+            <option value="Active" {{ 'selected' if member.status == 'Active' }}>Active</option>
+            <option value="Suspended" {{ 'selected' if member.status == 'Suspended' }}>Suspended</option>
+          </select>
+        </div>
+        {% endif %}
+      </div>
+
+      <div class="form-actions" style="margin-top:24px;">
+        <button type="submit" class="btn btn-primary">
+          <i class="fas fa-save"></i> {{ action }} Member
+        </button>
+        <a href="{{ url_for('members') }}" class="btn btn-ghost">Cancel</a>
+      </div>
+    </form>
+  </div>
+</div>
+{% endblock %}

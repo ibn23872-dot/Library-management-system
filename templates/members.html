@@ -1,0 +1,105 @@
+{% extends 'base.html' %}
+{% block title %}Members{% endblock %}
+{% block page_title %}Member Management{% endblock %}
+
+{% block content %}
+<div class="modal-overlay" id="confirm-modal" onclick="if(event.target===this)closeModal()">
+  <div class="modal">
+    <h3><i class="fas fa-exclamation-triangle" style="color:var(--danger)"></i> Confirm Delete</h3>
+    <p id="confirm-msg"></p>
+    <div class="modal-actions">
+      <button class="btn btn-ghost btn-sm" onclick="closeModal()">Cancel</button>
+      <button class="btn btn-danger btn-sm" onclick="confirmAction()">Delete</button>
+    </div>
+  </div>
+</div>
+
+<div class="page-header">
+  <h1><i class="fas fa-users"></i> Library Members</h1>
+  <a href="{{ url_for('add_member') }}" class="btn btn-primary">
+    <i class="fas fa-user-plus"></i> Register Member
+  </a>
+</div>
+
+<form class="search-bar" method="GET">
+  <input type="text" name="q" value="{{ query }}"
+         placeholder="Search by name, email, or member ID…">
+  <button type="submit" class="btn btn-primary"><i class="fas fa-search"></i> Search</button>
+  {% if query %}
+  <a href="{{ url_for('members') }}" class="btn btn-ghost"><i class="fas fa-times"></i> Clear</a>
+  {% endif %}
+</form>
+
+<div class="card">
+  <div class="card-header">
+    <i class="fas fa-table" style="color:var(--primary)"></i>
+    <h2>{{ members|length }} Member(s) Found</h2>
+  </div>
+  <div class="table-wrap">
+    {% if members %}
+    <table>
+      <thead>
+        <tr>
+          <th>ID</th>
+          <th>Full Name</th>
+          <th>Type</th>
+          <th>Department</th>
+          <th>Email</th>
+          <th>Contact</th>
+          <th>Expiry</th>
+          <th>Status</th>
+          <th>Actions</th>
+        </tr>
+      </thead>
+      <tbody>
+        {% for m in members %}
+        <tr>
+          <td><strong>{{ m.member_id }}</strong></td>
+          <td>{{ m.full_name }}</td>
+          <td>
+            <span class="badge
+              {% if m.membership_type == 'Faculty' %}badge-info
+              {% elif m.membership_type == 'Staff' %}badge-warning
+              {% else %}badge-secondary{% endif %}">
+              {{ m.membership_type }}
+            </span>
+          </td>
+          <td>{{ m.department or '—' }}</td>
+          <td style="font-size:12.5px">{{ m.email or '—' }}</td>
+          <td style="font-size:12.5px">{{ m.contact_number or '—' }}</td>
+          <td style="font-size:12.5px">{{ m.expiry_date }}</td>
+          <td>
+            <span class="badge {{ 'badge-success' if m.status == 'Active' else 'badge-danger' }}">
+              {{ m.status }}
+            </span>
+          </td>
+          <td>
+            <div style="display:flex;gap:6px;">
+              <a href="{{ url_for('edit_member', member_id=m.member_id) }}"
+                 class="btn btn-warning btn-sm btn-icon" title="Edit">
+                <i class="fas fa-edit"></i>
+              </a>
+              {% if session.role == 'Librarian' %}
+              <form id="del-mem-{{ m.member_id }}" method="POST"
+                    action="{{ url_for('delete_member', member_id=m.member_id) }}">
+                <button type="button" class="btn btn-danger btn-sm btn-icon" title="Delete"
+                        onclick="confirmDelete('del-mem-{{ m.member_id }}', '{{ m.full_name|replace("'","\\'")|e }}')">
+                  <i class="fas fa-trash"></i>
+                </button>
+              </form>
+              {% endif %}
+            </div>
+          </td>
+        </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+    {% else %}
+    <div class="empty-state">
+      <i class="fas fa-users"></i>
+      <p>No members found{% if query %} for "{{ query }}"{% endif %}.</p>
+    </div>
+    {% endif %}
+  </div>
+</div>
+{% endblock %}

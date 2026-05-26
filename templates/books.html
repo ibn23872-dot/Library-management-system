@@ -1,0 +1,115 @@
+{% extends 'base.html' %}
+{% block title %}Books{% endblock %}
+{% block page_title %}Book Management{% endblock %}
+
+{% block content %}
+<!-- Delete confirmation modal -->
+<div class="modal-overlay" id="confirm-modal" onclick="if(event.target===this)closeModal()">
+  <div class="modal">
+    <h3><i class="fas fa-exclamation-triangle" style="color:var(--danger)"></i> Confirm Delete</h3>
+    <p id="confirm-msg"></p>
+    <div class="modal-actions">
+      <button class="btn btn-ghost btn-sm" onclick="closeModal()">Cancel</button>
+      <button class="btn btn-danger btn-sm" onclick="confirmAction()">Delete</button>
+    </div>
+  </div>
+</div>
+
+<div class="page-header">
+  <h1><i class="fas fa-books"></i> Book Catalog</h1>
+  <a href="{{ url_for('add_book') }}" class="btn btn-primary">
+    <i class="fas fa-plus"></i> Add Book
+  </a>
+</div>
+
+<!-- Search -->
+<form class="search-bar" method="GET">
+  <input type="text" name="q" value="{{ query }}"
+         placeholder="Search by title, author, ISBN, or category…">
+  <button type="submit" class="btn btn-primary"><i class="fas fa-search"></i> Search</button>
+  {% if query %}
+  <a href="{{ url_for('books') }}" class="btn btn-ghost"><i class="fas fa-times"></i> Clear</a>
+  {% endif %}
+</form>
+
+<div class="card">
+  <div class="card-header">
+    <i class="fas fa-table" style="color:var(--primary)"></i>
+    <h2>{{ books|length }} Book(s) Found</h2>
+  </div>
+  <div class="table-wrap">
+    {% if books %}
+    <table>
+      <thead>
+        <tr>
+          <th>#</th>
+          <th>ISBN</th>
+          <th>Title</th>
+          <th>Author</th>
+          <th>Category</th>
+          <th>Available</th>
+          <th>Status</th>
+          <th>Shelf</th>
+          <th>Actions</th>
+        </tr>
+      </thead>
+      <tbody>
+        {% for book in books %}
+        <tr>
+          <td style="color:var(--text-muted)">{{ book.book_id }}</td>
+          <td><code style="font-size:12px">{{ book.isbn }}</code></td>
+          <td>
+            <strong>{{ book.title }}</strong>
+            {% if book.edition %}<br><span style="font-size:11.5px;color:var(--text-muted)">{{ book.edition }}</span>{% endif %}
+          </td>
+          <td>{{ book.author }}</td>
+          <td>
+            {% if book.category %}
+            <span class="badge badge-info">{{ book.category }}</span>
+            {% else %}&mdash;{% endif %}
+          </td>
+          <td>
+            <span class="badge {{ 'badge-success' if book.available_copies > 0 else 'badge-danger' }}">
+              {{ book.available_copies }}/{{ book.total_copies }}
+            </span>
+          </td>
+          <td>
+            <span class="badge
+              {% if book.status == 'Available' %}badge-success
+              {% elif book.status == 'Issued' %}badge-warning
+              {% else %}badge-danger{% endif %}">
+              {{ book.status }}
+            </span>
+          </td>
+          <td style="font-size:12.5px;color:var(--text-muted)">{{ book.shelf_location or '—' }}</td>
+          <td>
+            <div style="display:flex;gap:6px;">
+              <a href="{{ url_for('edit_book', book_id=book.book_id) }}"
+                 class="btn btn-warning btn-sm btn-icon" title="Edit">
+                <i class="fas fa-edit"></i>
+              </a>
+              {% if session.role == 'Librarian' %}
+              <form id="del-book-{{ book.book_id }}" method="POST"
+                    action="{{ url_for('delete_book', book_id=book.book_id) }}">
+                <button type="button" class="btn btn-danger btn-sm btn-icon"
+                        title="Delete"
+                        onclick="confirmDelete('del-book-{{ book.book_id }}', '{{ book.title|replace("'","\\'")|e }}')">
+                  <i class="fas fa-trash"></i>
+                </button>
+              </form>
+              {% endif %}
+            </div>
+          </td>
+        </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+    {% else %}
+    <div class="empty-state">
+      <i class="fas fa-books"></i>
+      <p>No books found{% if query %} for "{{ query }}"{% endif %}.</p>
+    </div>
+    {% endif %}
+  </div>
+</div>
+{% endblock %}

@@ -1,0 +1,93 @@
+{% extends 'base.html' %}
+{% block title %}Return Book{% endblock %}
+{% block page_title %}Return Book{% endblock %}
+
+{% block content %}
+<div class="page-header">
+  <h1><i class="fas fa-undo-alt"></i> Return a Book</h1>
+</div>
+
+<div style="display:grid;grid-template-columns:1fr 1fr;gap:24px;">
+  <div class="card">
+    <div class="card-header">
+      <i class="fas fa-edit" style="color:var(--primary)"></i>
+      <h2>Return Details</h2>
+    </div>
+    <div class="card-body">
+      <form method="POST">
+        <div class="form-group" style="margin-bottom:18px;">
+          <label for="member_id">Member ID <span style="color:var(--danger)">*</span></label>
+          <input type="number" id="member_id" name="member_id"
+                 placeholder="Enter member ID"
+                 oninput="lookupMember(this, document.getElementById('member-info'))"
+                 required>
+          <div id="member-info" style="margin-top:6px;min-height:24px;"></div>
+        </div>
+        <div class="form-group" style="margin-bottom:24px;">
+          <label for="isbn">Book ISBN <span style="color:var(--danger)">*</span></label>
+          <input type="text" id="isbn" name="isbn"
+                 placeholder="Enter book ISBN"
+                 oninput="lookupBook(this, document.getElementById('book-info'))"
+                 required>
+          <div id="book-info" style="margin-top:6px;min-height:24px;"></div>
+        </div>
+        <button type="submit" class="btn btn-success" style="width:100%;justify-content:center;padding:12px;">
+          <i class="fas fa-check-circle"></i> Process Return
+        </button>
+      </form>
+    </div>
+  </div>
+
+  <div class="card">
+    <div class="card-header">
+      <i class="fas fa-receipt" style="color:var(--warning)"></i>
+      <h2>Fine Calculation</h2>
+    </div>
+    <div class="card-body" style="font-size:13.5px;color:var(--text-muted);line-height:1.7;">
+      <p>When a book is returned after the due date, a fine is automatically calculated:</p>
+      <br>
+      <p><strong>Fine = Days Overdue × 2.00 ETB</strong></p>
+      <br>
+      <p>The fine will be recorded in the member's account and must be paid before their account is fully cleared.</p>
+    </div>
+  </div>
+</div>
+
+{% if result %}
+<div class="result-box {{ 'overdue' if result.fine_amount > 0 else '' }}" style="margin-top:24px;">
+  <h3>
+    <i class="fas fa-{{ 'exclamation-triangle' if result.fine_amount > 0 else 'check-circle' }}"
+       style="color:{{ 'var(--warning)' if result.fine_amount > 0 else 'var(--success)' }}"></i>
+    Return {{ 'with Fine' if result.fine_amount > 0 else 'Processed — No Fine' }}
+  </h3>
+  <div class="result-grid">
+    <div class="result-item">
+      <label>Member</label>
+      <span>{{ result.member_name }}</span>
+    </div>
+    <div class="result-item">
+      <label>Book Title</label>
+      <span>{{ result.book_title }}</span>
+    </div>
+    <div class="result-item">
+      <label>Due Date</label>
+      <span>{{ result.due_date }}</span>
+    </div>
+    <div class="result-item">
+      <label>Return Date</label>
+      <span>{{ result.return_date }}</span>
+    </div>
+    <div class="result-item">
+      <label>Days Overdue</label>
+      <span>{{ result.days_late }}</span>
+    </div>
+    <div class="result-item">
+      <label>Fine Amount</label>
+      <span class="{{ 'fine-amount' if result.fine_amount > 0 else '' }}">
+        {{ '%.2f ETB'|format(result.fine_amount) }}
+      </span>
+    </div>
+  </div>
+</div>
+{% endif %}
+{% endblock %}

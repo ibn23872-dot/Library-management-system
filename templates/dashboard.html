@@ -1,0 +1,112 @@
+{% extends 'base.html' %}
+{% block title %}Dashboard{% endblock %}
+{% block page_title %}<i class="fas fa-tachometer-alt"></i> Dashboard{% endblock %}
+
+{% block content %}
+<div class="page-header">
+  <h1><i class="fas fa-tachometer-alt"></i> Dashboard</h1>
+</div>
+
+<!-- Stats Grid -->
+<div class="stats-grid">
+  <div class="stat-card">
+    <div class="stat-icon blue"><i class="fas fa-book"></i></div>
+    <div class="stat-info">
+      <div class="stat-value">{{ book_stats.total or 0 }}</div>
+      <div class="stat-label">Total Books</div>
+    </div>
+  </div>
+  <div class="stat-card">
+    <div class="stat-icon green"><i class="fas fa-check-circle"></i></div>
+    <div class="stat-info">
+      <div class="stat-value">{{ book_stats.avail or 0 }}</div>
+      <div class="stat-label">Available Copies</div>
+    </div>
+  </div>
+  <div class="stat-card">
+    <div class="stat-icon purple"><i class="fas fa-users"></i></div>
+    <div class="stat-info">
+      <div class="stat-value">{{ member_stats.total or 0 }}</div>
+      <div class="stat-label">Total Members</div>
+    </div>
+  </div>
+  <div class="stat-card">
+    <div class="stat-icon amber"><i class="fas fa-hand-holding-heart"></i></div>
+    <div class="stat-info">
+      <div class="stat-value">{{ borrow_stats.active or 0 }}</div>
+      <div class="stat-label">Active Borrowings</div>
+    </div>
+  </div>
+  <div class="stat-card">
+    <div class="stat-icon red"><i class="fas fa-receipt"></i></div>
+    <div class="stat-info">
+      <div class="stat-value">{{ '%.2f'|format(fine_stats.unpaid_total or 0) }}</div>
+      <div class="stat-label">Unpaid Fines (ETB)</div>
+    </div>
+  </div>
+</div>
+
+<!-- Dashboard grid -->
+<div class="dashboard-grid">
+  <!-- Overdue Books -->
+  <div class="card">
+    <div class="card-header">
+      <i class="fas fa-exclamation-triangle" style="color:var(--danger)"></i>
+      <h2>Overdue Books</h2>
+      <a href="{{ url_for('transactions') }}" class="btn btn-ghost btn-sm" style="margin-left:auto">View All</a>
+    </div>
+    <div class="table-wrap">
+      {% if overdue %}
+      <table>
+        <thead>
+          <tr>
+            <th>Member</th>
+            <th>Book Title</th>
+            <th>Due Date</th>
+          </tr>
+        </thead>
+        <tbody>
+          {% for item in overdue %}
+          <tr class="overdue-row">
+            <td>{{ item.full_name }}</td>
+            <td>{{ item.title }}</td>
+            <td>{{ item.due_date }}</td>
+          </tr>
+          {% endfor %}
+        </tbody>
+      </table>
+      {% else %}
+      <div class="empty-state">
+        <i class="fas fa-check-circle" style="color:var(--success)"></i>
+        <p>No overdue books — great!</p>
+      </div>
+      {% endif %}
+    </div>
+  </div>
+
+  <!-- Quick Actions -->
+  <div class="card">
+    <div class="card-header">
+      <i class="fas fa-bolt" style="color:var(--accent)"></i>
+      <h2>Quick Actions</h2>
+    </div>
+    <div class="card-body" style="display:flex;flex-direction:column;gap:12px;">
+      <a href="{{ url_for('borrow') }}" class="btn btn-primary" style="width:100%;justify-content:center;">
+        <i class="fas fa-hand-holding-heart"></i> Issue a Book
+      </a>
+      <a href="{{ url_for('return_book') }}" class="btn btn-success" style="width:100%;justify-content:center;">
+        <i class="fas fa-undo-alt"></i> Return a Book
+      </a>
+      <a href="{{ url_for('add_book') }}" class="btn btn-ghost" style="width:100%;justify-content:center;">
+        <i class="fas fa-plus"></i> Add New Book
+      </a>
+      <a href="{{ url_for('add_member') }}" class="btn btn-ghost" style="width:100%;justify-content:center;">
+        <i class="fas fa-user-plus"></i> Register Member
+      </a>
+      <a href="{{ url_for('fines') }}" class="btn btn-ghost" style="width:100%;justify-content:center;">
+        <i class="fas fa-receipt"></i> View Fines
+      </a>
+    </div>
+  </div>
+</div>
+{% endblock %}
